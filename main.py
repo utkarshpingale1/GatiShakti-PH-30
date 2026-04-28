@@ -196,15 +196,21 @@ class Handler(SimpleHTTPRequestHandler):
         return routes.get(path, lambda: respond(self, "<h2>404 Not Found</h2>"))()
 
     def do_POST(self):
-        path = urlparse(self.path).path
-        length = int(self.headers.get("Content-Length", 0))
-        body = self.rfile.read(length).decode("utf-8")
-        q = parse_qs(body)
-        if path == "/save_ph30":
-            return self.save_ph30(q)
-        if path == "/delete_ph30":
-            return self.delete_ph30(q)
-        respond(self, "<h2>404</h2>")
+    path = urlparse(self.path).path
+    length = int(self.headers.get("Content-Length", 0))
+    body = self.rfile.read(length).decode("utf-8")
+    q = parse_qs(body)
+
+    print("POST PATH:", path)
+    print("DATA:", q)
+
+    if path == "/save_ph30":
+        return self.save_ph30(q)
+
+    if path == "/delete_ph30":
+        return self.delete_ph30(q)
+
+    return respond(self, "404")
 
     # ================= HOME =================
     def home(self):
