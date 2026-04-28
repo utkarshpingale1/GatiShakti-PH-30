@@ -262,7 +262,8 @@ h1 {
 }
 
 .subtitle {
-  color: var(--muted);
+  # color: var(--muted);
+  color: black;
   margin-bottom: 40px;
   font-size: 14px;
 }
@@ -328,7 +329,8 @@ h1 {
 .footer {
   margin-top: 50px;
   font-size: 12px;
-  color: var(--muted);
+  # color: var(--muted);
+  color: black;
 }
 </style>
 
