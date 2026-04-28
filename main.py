@@ -2071,10 +2071,17 @@ f"<script>{JS}</script>\n"
 
 
 # ================= SERVER =================
-PORT = 8000
+import os
+import socketserver
+from http.server import SimpleHTTPRequestHandler
 
-socketserver.TCPServer.allow_reuse_address = True
+PORT = int(os.environ.get("PORT", 10000))
 
-with socketserver.TCPServer(("", PORT), Handler) as httpd:
-    print(f"🚀 Running at http://localhost:{PORT}")
-    httpd.serve_forever()
+Handler = SimpleHTTPRequestHandler
+
+try:
+    with socketserver.TCPServer(("", PORT), Handler) as httpd:
+        print(f"Server running on port {PORT}")
+        httpd.serve_forever()
+except Exception as e:
+    print("ERROR:", e)
