@@ -9,11 +9,14 @@ import os, socket, socketserver, webbrowser, traceback, secrets, csv
 from datetime import date, datetime
 
 # ================= DB CONFIG =================
-# engine = create_engine(
-#     "postgresql://postgres:postgres@192.168.1.156:5432/Indian_Railway",
-#     connect_args={"options": "-csearch_path=gatishakti"},
-#     pool_pre_ping=True
-# )
+import os
+
+DATABASE_URL = os.environ.get("postgresql://gatishakti_user:Sp40xum28lv33Nwiyk6oYBWvApsPtUF2@dpg-d7o8bqd7vvec739jttvg-a/gatishakti")
+
+engine = create_engine(
+    DATABASE_URL,
+    pool_pre_ping=True
+)
 
 # ================= MASTER BLOCK DATA =================
 # Format: block_section -> list of (direction, tvu, agency)
@@ -162,7 +165,7 @@ def init_db():
             except Exception:
                 pass
 
-# init_db()
+init_db()
 
 # ================= HELPERS =================
 def respond(handler, html):
