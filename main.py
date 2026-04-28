@@ -2072,16 +2072,15 @@ f"<script>{JS}</script>\n"
 
 # ================= SERVER =================
 import os
-import socketserver
-from http.server import SimpleHTTPRequestHandler
+from http.server import SimpleHTTPRequestHandler, HTTPServer
 
 PORT = int(os.environ.get("PORT", 10000))
 
 Handler = SimpleHTTPRequestHandler
 
 try:
-    with socketserver.TCPServer(("", PORT), Handler) as httpd:
-        print(f"Server running on port {PORT}")
-        httpd.serve_forever()
+    httpd = HTTPServer(("0.0.0.0", PORT), Handler)
+    print(f"Server running on port {PORT}")
+    httpd.serve_forever()
 except Exception as e:
     print("ERROR:", e)
