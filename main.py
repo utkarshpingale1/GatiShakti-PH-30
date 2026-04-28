@@ -11,7 +11,7 @@ from datetime import date, datetime
 # ================= DB CONFIG =================
 import os
 
-DATABASE_URL = os.environ.get("postgresql://gatishakti_user:Sp40xum28lv33Nwiyk6oYBWvApsPtUF2@dpg-d7o8bqd7vvec739jttvg-a/gatishakti")
+DATABASE_URL = os.environ.get("DATABASE_URL")
 
 engine = create_engine(
     DATABASE_URL,
