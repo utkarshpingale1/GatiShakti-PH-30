@@ -167,36 +167,6 @@ def init_db():
 
 init_db()
 
-import csv
-
-with engine.begin() as db:
-    result = db.execute(text("SELECT COUNT(*) FROM ph30_lc_projects"))
-    count = result.scalar()
-
-    if count == 0:
-        print("Loading CSV data...")
-
-        with open("data.csv", newline='', encoding="utf-8") as f:
-            reader = csv.DictReader(f)
-
-            for row in reader:
-                db.execute(text("""
-                    INSERT INTO ph30_lc_projects (
-                        lc_no, km, block_section, sectional_den,
-                        tvu, executing_agency
-                    ) VALUES (
-                        :lc_no, :km, :block_section, :sectional_den,
-                        :tvu, :executing_agency
-                    )
-                """), {
-                    "lc_no": row.get("lc_no"),
-                    "km": row.get("km"),
-                    "block_section": row.get("block_section"),
-                    "sectional_den": row.get("sectional_den"),
-                    "tvu": int(row.get("tvu") or 0),
-                    "executing_agency": row.get("executing_agency")
-                })
-
 # ================= HELPERS =================
 def respond(handler, html):
     handler.send_response(200)
