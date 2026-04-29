@@ -175,7 +175,10 @@ def respond(handler, html):
     handler.wfile.write(html.encode("utf-8"))
 
 def safe_date(val):
-    return val if val and val.strip() else None
+    try:
+        return datetime.strptime(val, "%Y-%m-%d").date()
+    except:
+        return None
 
 def safe_num(val, default=None):
     try:
@@ -1113,7 +1116,7 @@ async function saveEntry(){
                     f"<td class='grp-sep'>{num_cell(r['exp_2024_25'])}</td>"
                     f"<td>{prog_bar(r['progress'])}</td>"
                     f"<td class='cell-muted'>{tdc_s}</td>"
-                    f"<td><button class='remark-btn' onclick=\"openRemark(`{r['remarks'] or '—'}`)\">View</button></td>"
+                    f"<td><button class='remark-btn' data-remark=\"{(r['remarks'] or '—').replace('\"','&quot;')}\" onclick=\"openRemark(this.dataset.remark)\">View</button></td>"
                     f"</tr>"
                 )
      
@@ -1881,23 +1884,55 @@ async function saveEntry(){
     }
      
     function exportCSV() {
-      const hdrs = ['ID','LC No','KM','Block Section','DEN','TVU','Agency','Year',
-        'GAD Status','LC Permission','Cost Sharing','Est Status','CRS Const',
-        'CRS Closure','CRS Shift','Tender','Tender Status','Drawing','Land Acq',
-        'Sanct Cost','Rly Share','State Share','Exp Mar24','Outlay','Exp 24-25',
-        'Progress','TDC','Remarks'];
-      const esc  = v => '"'+String(v).replace(/"/g,'""')+'"';
-      const rows = Array.from(
-        document.querySelectorAll('#tableBody tr:not(.filtered-out)[data-search]')
-      ).map(tr => Array.from(tr.querySelectorAll('td')).slice(1)
-        .map(td => esc(td.innerText.trim())).join(','));
-      const csv  = [hdrs.join(','), ...rows].join('\\n');
-      const a = Object.assign(document.createElement('a'), {
-        href    : 'data:text/csv;charset=utf-8,'+encodeURIComponent(csv),
-        download: 'ph30_'+new Date().toISOString().slice(0,10)+'.csv'
-      });
-      a.click();
-    }
+
+  const headers = [
+    'ID','LC No','KM','Block Section','DEN','TVU','Agency','Year',
+    'GAD Status','LC Permission','Cost Sharing','Est Status','CRS Const',
+    'CRS Closure','CRS Shift','Tender','Tender Status','Drawing','Land Acq',
+    'Sanct Cost','Rly Share','State Share','Exp Mar24','Outlay','Exp 24-25',
+    'Progress','TDC','Remarks'
+  ];
+
+  function clean(val){
+    if (!val || val.trim() === '' || val === '—') return 'NA';
+    return val.replace(/\s+/g, ' ').trim();
+  }
+
+  function esc(val){
+    return `"${String(val).replace(/"/g,'""')}"`;
+  }
+
+  const rows = Array.from(
+    document.querySelectorAll('#tableBody tr:not(.filtered-out)')
+  ).map(tr => {
+
+    const cells = Array.from(tr.querySelectorAll('td')).slice(1);
+
+    return cells.map(td => {
+
+      let val;
+
+      // 🔥 KEY FIX
+      if (td.querySelector('.remark-btn')) {
+        val = td.querySelector('.remark-btn').dataset.remark;
+      } else {
+        val = td.innerText;
+      }
+
+      return esc(clean(val));
+
+    }).join(',');
+
+  });
+
+  const csv = [headers.join(','), ...rows].join('\n');
+
+  const blob = new Blob([csv], {type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'ph30_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+}
 
     function openRemark(text){
   document.getElementById("remarkContent").innerText = text;
